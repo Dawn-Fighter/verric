@@ -36,6 +36,13 @@ function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+// Local draft persistence. The project brief and manual notes are the most
+// expensive things to re-type, so we keep them in localStorage and restore
+// them on load. Evidence files and the generated report are intentionally not
+// persisted (file handles can't be rehydrated and the report should always be
+// re-run against fresh evidence).
+const DRAFT_STORAGE_KEY = "verric:draft-brief";
+
 const REVIEW_MESSAGES = [
   "Reading the raw mess…",
   "Parsing nmap, Burp & sqlmap…",
@@ -286,6 +293,35 @@ export default function Home() {
   const readyFindings = report.findings.filter((finding) => finding.readiness === "ready").length;
   const visibleBlockingGaps = hasReviewed ? blockingGaps : [];
   const visibleReadyFindings = hasReviewed ? readyFindings : 0;
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  // Restore the saved brief once on mount. Merge over emptyProjectDetails so a
+  // future schema change can't leave required fields undefined.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as { project?: Partial<ProjectDetails>; manualNotes?: string };
+        if (parsed.project) setProject((current) => ({ ...current, ...parsed.project }));
+        if (typeof parsed.manualNotes === "string") setManualNotes(parsed.manualNotes);
+      }
+    } catch {
+      // Corrupt or unavailable storage — fall back to defaults silently.
+    } finally {
+      setDraftRestored(true);
+    }
+  }, []);
+
+  // Persist the brief whenever it changes, but only after the initial restore
+  // so we never clobber saved data with the default values on first render.
+  useEffect(() => {
+    if (!draftRestored) return;
+    try {
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ project, manualNotes }));
+    } catch {
+      // Storage may be full or disabled (private mode) — non-fatal.
+    }
+  }, [draftRestored, project, manualNotes]);
 
   function updateProject<K extends keyof ProjectDetails>(key: K, value: ProjectDetails[K]) {
     setProject((current) => ({ ...current, [key]: value }));
