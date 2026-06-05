@@ -1,0 +1,32 @@
+# Evidence Artifact: Burp Suite request/response PoC
+# Finding: Unauthenticated Administrative Panel
+# Captured by: Burp Suite Repeater
+
+=== REQUEST ===
+GET /admin HTTP/1.1
+Host: acme-staging.local
+User-Agent: Mozilla/5.0 Verric-Demo
+Accept: text/html,application/xhtml+xml
+Cookie:
+
+=== RESPONSE ===
+HTTP/1.1 200 OK
+Server: Apache/2.4.18 (Ubuntu)
+Content-Type: text/html; charset=UTF-8
+Content-Length: 1842
+
+<html>
+  <head><title>ACME Admin Console</title></head>
+  <body>
+    <h1>Admin Dashboard</h1>
+    <nav>Users | Billing | Audit Logs | System Settings</nav>
+    <section id="user-management">
+      <h2>User Management</h2>
+      <button>Create User</button>
+      <button>Reset Password</button>
+    </section>
+  </body>
+</html>
+
+=== TESTER NOTE ===
+No session cookie or Authorization header was supplied. The response returned HTTP 200 OK and rendered administrative user-management controls. Screenshot evidence is attached as 07-admin-panel-screenshot.png.

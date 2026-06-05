@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background: #f3efe4;
+  color: #17140f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(rgba(23, 20, 15, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 20, 15, 0.018) 1px, transparent 1px),
+    #f3efe4;
+  background-size: 34px 34px, 34px 34px, auto;
+  color: #17140f;
+}
+
+::selection {
+  background: #c73524;
+  color: #f3efe4;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #f3efe4;
+  }
+
+  .print-report {
+    width: 100% !important;
+    border: none !important;
+  }
+}

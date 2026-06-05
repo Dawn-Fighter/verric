@@ -1,0 +1,21 @@
+# Evidence Artifact: External service enumeration
+# Target: acme-staging.local / 10.10.10.5
+# Tool: Nmap 7.94
+# Command: nmap -sV -sC -oA acme-external 10.10.10.5
+
+Starting Nmap 7.94 ( https://nmap.org ) at 2026-06-05 10:14 IST
+Nmap scan report for acme-staging.local (10.10.10.5)
+Host is up (0.043s latency).
+Not shown: 996 filtered tcp ports (no-response)
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+443/tcp  open  ssl/http Apache httpd 2.4.18 ((Ubuntu))
+3306/tcp open  mysql   MySQL 5.7.31-0ubuntu0.16.04.1
+
+Host script results:
+| http-title: ACME Staging Portal
+|_Requested resource was /login
+
+Nmap done: 1 IP address (1 host up) scanned in 42.61 seconds

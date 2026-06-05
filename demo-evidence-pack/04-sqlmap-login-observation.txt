@@ -1,0 +1,19 @@
+# Evidence Artifact: SQL injection investigation notes
+# Finding candidate: Login parameter appears injectable, but exploitation proof incomplete
+# Tool: sqlmap 1.8.3
+
+Command executed:
+sqlmap -u "https://acme-staging.local/login" --data="username=admin&password=test" -p username --batch --risk=1 --level=2
+
+Relevant output:
+[10:42:11] [INFO] testing if POST parameter 'username' is dynamic
+[10:42:12] [INFO] POST parameter 'username' appears to be dynamic
+[10:42:18] [INFO] heuristic (basic) test shows that POST parameter 'username' might be injectable
+[10:42:21] [WARNING] reflective value(s) found and filtering out
+[10:42:36] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[10:43:04] [WARNING] target returned unstable responses; unable to confirm injection
+[10:43:05] [INFO] testing 'PostgreSQL AND error-based - WHERE or HAVING clause'
+[10:43:27] [WARNING] no confirmed injection was found during this run
+
+Tester conclusion:
+The parameter produced suspicious behavior but there is no confirmed exploit proof. This should be treated as "needs PoC" until a confirmed payload, request/response pair, or database error is captured.
