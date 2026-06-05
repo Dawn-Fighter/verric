@@ -97,13 +97,15 @@ function specTable(rows: Array<[string, string, boolean?]>) {
 }
 
 function claimParagraphs(title: string, claims: ReportClaim[]) {
-  const verified = claims.filter((claim) => claim.status === "grounded");
+  // Keep grounded + partially-supported claims in the polished body. Only
+  // genuinely unsupported (flagged) claims get pulled out.
+  const verified = claims.filter((claim) => claim.status === "grounded" || claim.status === "needs_review");
   if (verified.length === 0) return [];
   return [label(title), ...verified.map((claim) => p(`${claim.text}${claim.evidenceIds.length ? ` [${claim.evidenceIds.join(", ")}]` : ""}`))];
 }
 
 function isVerifiedClaim(claim: ReportClaim) {
-  return claim.status === "grounded";
+  return claim.status === "grounded" || claim.status === "needs_review";
 }
 
 type UnverifiedRow = { source: string; text: string; status: ReportClaim["status"]; reason: string };

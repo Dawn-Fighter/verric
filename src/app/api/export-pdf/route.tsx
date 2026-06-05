@@ -67,8 +67,11 @@ function isUnconfirmedFinding(finding: Finding) {
   return /potential|candidate|unconfirmed|not confirmed|requires further|no successful payload|needs poc/i.test(text) || finding.readiness === "needs_poc" || finding.readiness === "unsupported";
 }
 
+// In the polished client export, we keep claims that are grounded OR partially supported
+// (partial = the evidence backs the gist but the wording goes slightly beyond it — still
+// usable in a professional report). Only "flagged" / unsupported claims get pulled out.
 function isVerified(claim: ReportClaim) {
-  return claim.status === "grounded";
+  return claim.status === "grounded" || claim.status === "needs_review";
 }
 
 function partitionClaims(claims: ReportClaim[]): { verified: ReportClaim[]; unverified: ReportClaim[] } {

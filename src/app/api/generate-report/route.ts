@@ -188,6 +188,19 @@ Rules:
 - reportReadiness is "ready" when confirmed findings have enough evidence for a client report. Unconfirmed hypotheses such as suspicious-but-unconfirmed SQL injection should be moved to flaggedClaims or a needs_poc finding, not used to block confirmed findings.
 - Do not include vague claims like "lacks detailed exploitation steps" if the evidence already includes a request, response, and observed result. Be precise about what is actually missing.
 
+Unconfirmed observations rule (CRITICAL — do not skip):
+- Scan the evidence for words like "candidate", "needs PoC", "unconfirmed", "unable to confirm", "suspicious behavior", "no confirmed injection", "investigate further", "warning", "heuristic", "not proven", "no successful payload", or tester notes that explicitly say something should NOT ship as confirmed.
+- For EVERY such observation, you MUST emit a separate finding entry with:
+  - readiness: "needs_poc"
+  - status: "Needs Review"
+  - cvss: "N/A", cvssVector: "N/A", severity: "Review"
+  - title clearly prefixed with "Potential" or "Candidate" (e.g. "Potential SQL Injection in Login Username Parameter")
+  - at least one entry in "gaps" with type "missing_poc", severity "blocking", and concrete suggestedEvidence list (e.g. ["Confirmed sqlmap payload", "Request and response showing data extraction", "Database error or boolean-based blind proof"])
+  - readinessSummary that states exactly what proof is missing
+  - reportReadiness at the top level becomes "needs_poc" if ANY finding is needs_poc
+- Even if confirmed findings exist, an unconfirmed observation must still appear as its own needs_poc finding. Do NOT silently drop unconfirmed candidates from the report just because confirmed findings cover the engagement.
+- Also add an entry to flaggedClaims for the over-stated version of the unconfirmed claim (e.g. "The login parameter is confirmed vulnerable to SQL injection") with the reason being the missing proof.
+
 CVSS scoring rules (mandatory):
 - The CVSS base score MUST be consistent with the CVSS:3.1 vector you supply. Compute, do not guess.
 - ALWAYS include all 8 base metrics in the vector, including the Scope metric "S:U" or "S:C". A vector without S: is invalid.
