@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   type EvidenceArtifact,
   type EvidenceChunk,
@@ -34,6 +34,39 @@ const steps: Array<{ id: StudioStep; label: string; title: string }> = [
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
+}
+
+const REVIEW_MESSAGES = [
+  "Reading the raw mess…",
+  "Parsing nmap, Burp & sqlmap…",
+  "Drafting findings with grounding…",
+  "Computing CVSS 3.1 base scores…",
+  "Mapping every claim to evidence…",
+  "Second-guessing the AI…",
+  "Flagging anything we can't prove…",
+  "Polishing the deliverable…"
+];
+
+function useReviewMessage(isGenerating: boolean) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (!isGenerating) {
+      setIndex(0);
+      return;
+    }
+    const interval = setInterval(() => setIndex((current) => (current + 1) % REVIEW_MESSAGES.length), 2200);
+    return () => clearInterval(interval);
+  }, [isGenerating]);
+  return REVIEW_MESSAGES[index];
+}
+
+function Spinner() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 animate-spin" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" strokeOpacity="0.25" />
+      <path d="M21 12a9 9 0 0 0-9-9" strokeLinecap="round" />
+    </svg>
+  );
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -248,6 +281,7 @@ export default function Home() {
   const [activeEvidenceIds, setActiveEvidenceIds] = useState<string[]>([]);
   const [activeClaimId, setActiveClaimId] = useState<string | null>(null);
   const claims = useMemo(() => allClaims(report), [report]);
+  const reviewMessage = useReviewMessage(isGenerating);
   const blockingGaps = [...report.globalGaps, ...report.findings.flatMap((finding) => finding.gaps)].filter((gap) => gap.severity === "blocking");
   const readyFindings = report.findings.filter((finding) => finding.readiness === "ready").length;
   const visibleBlockingGaps = hasReviewed ? blockingGaps : [];
@@ -351,8 +385,8 @@ export default function Home() {
             <span className="font-mono text-xs font-bold uppercase tracking-[0.26em]">Verric</span>
           </div>
           <div className="font-mono text-[10px] uppercase tracking-[0.26em] text-muted">AI reporting studio · proof before polish</div>
-          <button onClick={runVerricReview} disabled={isGenerating || chunks.length === 0} className="bg-verric px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-paper transition hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50">
-            {isGenerating ? "Reviewing Evidence..." : "Run Verric Review"}
+          <button onClick={runVerricReview} disabled={isGenerating || chunks.length === 0} className="inline-flex items-center gap-2 bg-verric px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-paper transition hover:bg-ink disabled:cursor-not-allowed disabled:opacity-60">
+            {isGenerating ? <><Spinner /><span>{reviewMessage}</span></> : <span>Run Verric Review</span>}
           </button>
         </header>
 
