@@ -376,6 +376,30 @@ export default function Home() {
     setActiveEvidenceIds(claim.evidenceIds);
   }
 
+  function resetStudio() {
+    const hasWork = artifacts.length > 0 || manualNotes.trim().length > 0 || hasReviewed;
+    if (hasWork && !window.confirm("Start a new report? This clears the current brief, evidence, and draft.")) {
+      return;
+    }
+    setStep("setup");
+    setProject(emptyProjectDetails);
+    setArtifacts([]);
+    setManualNotes("");
+    setReport(validateReport(createMockReport([], emptyProjectDetails), [], emptyProjectDetails));
+    setMode("mock");
+    setHasReviewed(false);
+    setError(null);
+    setActiveEvidenceIds([]);
+    setActiveClaimId(null);
+    if (inputRef.current) inputRef.current.value = "";
+    // Also clear any auto-saved draft (no-op if persistence isn't enabled).
+    try {
+      localStorage.removeItem("verric:draft-brief");
+    } catch {
+      // storage unavailable — nothing to clear
+    }
+  }
+
   return (
     <main className="min-h-screen px-4 py-5 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[1540px] border-x border-rule bg-paper/70">
@@ -385,9 +409,14 @@ export default function Home() {
             <span className="font-mono text-xs font-bold uppercase tracking-[0.26em]">Verric</span>
           </div>
           <div className="font-mono text-[10px] uppercase tracking-[0.26em] text-muted">AI reporting studio · proof before polish</div>
-          <button onClick={runVerricReview} disabled={isGenerating || chunks.length === 0} className="inline-flex items-center gap-2 bg-verric px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-paper transition hover:bg-ink disabled:cursor-not-allowed disabled:opacity-60">
-            {isGenerating ? <><Spinner /><span>{reviewMessage}</span></> : <span>Run Verric Review</span>}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={resetStudio} disabled={isGenerating} title="Clear the brief, evidence, and draft to start a fresh report" className="inline-flex items-center gap-2 border border-rule bg-paper px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-ink transition hover:bg-panel disabled:cursor-not-allowed disabled:opacity-60">
+              New Report
+            </button>
+            <button onClick={runVerricReview} disabled={isGenerating || chunks.length === 0} className="inline-flex items-center gap-2 bg-verric px-5 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-paper transition hover:bg-ink disabled:cursor-not-allowed disabled:opacity-60">
+              {isGenerating ? <><Spinner /><span>{reviewMessage}</span></> : <span>Run Verric Review</span>}
+            </button>
+          </div>
         </header>
 
         <section className="grid gap-0 border-b border-rule lg:grid-cols-[330px_1fr_360px]">
