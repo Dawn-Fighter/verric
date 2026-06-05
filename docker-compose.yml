@@ -18,7 +18,9 @@ services:
       USE_MOCK_REPORT: ${USE_MOCK_REPORT:-false}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      # Alpine ships busybox wget (no --spider/--no-verbose), and the server
+      # binds to IPv4 0.0.0.0, so probe 127.0.0.1 rather than localhost (::1).
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
       interval: 30s
       timeout: 5s
       retries: 3
