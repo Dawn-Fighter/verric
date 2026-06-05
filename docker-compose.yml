@@ -1,0 +1,25 @@
+services:
+  verric:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: verric:latest
+    container_name: verric
+    ports:
+      - "3000:3000"
+    # Secrets are injected at runtime, never baked into the image.
+    # Reuses your existing .env.local (OPENAI_API_KEY / OPENAI_MODEL / USE_MOCK_REPORT).
+    env_file:
+      - .env.local
+    environment:
+      NODE_ENV: production
+      # Sensible fallbacks if a value is absent from .env.local.
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      USE_MOCK_REPORT: ${USE_MOCK_REPORT:-false}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
