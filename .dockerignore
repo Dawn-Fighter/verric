@@ -1,0 +1,41 @@
+# Dependencies / build artifacts (rebuilt inside the image)
+node_modules
+.next
+out
+build
+
+# Local env & secrets — never bake these into the image
+.env
+.env*.local
+
+# Git & CI
+.git
+.gitignore
+
+# Editor / OS noise
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Project scratch / demo evidence not needed at runtime
+.page*.png
+.pf*.png
+.nf*.png
+.vp*.png
+bin/
+tsconfig.tsbuildinfo
+demo-evidence-pack
+demo-complete-evidence-pack
+demo-complete-evidence-pack-README.md
