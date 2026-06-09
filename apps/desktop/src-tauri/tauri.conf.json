@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Verric",
+  "version": "0.1.0",
+  "identifier": "ai.verric.studio",
+  "build": {
+    "beforeDevCommand": "pnpm --filter @verric/web dev",
+    "devUrl": "http://localhost:3000",
+    "frontendDist": "http://localhost:3000"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Verric — pentest reports you can prove",
+        "width": 1480,
+        "height": 960,
+        "minWidth": 1024,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "appimage", "msi", "dmg", "app"],
+    "category": "DeveloperTool",
+    "shortDescription": "Evidence-grounded report engine — pentest, postmortem, audit",
+    "longDescription": "Verric turns the messy pile of evidence collected during a pentest, incident, or audit into a polished report where every claim cites its source. Real provider or honest failure — no mock fallback. Cryptographic receipts make every report independently verifiable.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

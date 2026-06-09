@@ -1,0 +1,16 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# pnpm 11+: explicitly allow build scripts for these packages
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  better-sqlite3: true
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - better-sqlite3

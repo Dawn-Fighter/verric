@@ -8,14 +8,16 @@ services:
     ports:
       - "3000:3000"
     # Secrets are injected at runtime, never baked into the image.
-    # Reuses your existing .env.local (OPENAI_API_KEY / OPENAI_MODEL / USE_MOCK_REPORT).
+    # Reuses your existing apps/web/.env.local. Verric supports OpenAI,
+    # Anthropic, or local Ollama via VERRIC_PROVIDER. There is NO mock
+    # fallback — if the chosen provider can't be reached, the run fails
+    # honestly with a real error.
     env_file:
-      - .env.local
+      - apps/web/.env.local
     environment:
       NODE_ENV: production
-      # Sensible fallbacks if a value is absent from .env.local.
+      VERRIC_PROVIDER: ${VERRIC_PROVIDER:-openai}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
-      USE_MOCK_REPORT: ${USE_MOCK_REPORT:-false}
     restart: unless-stopped
     healthcheck:
       # Alpine ships busybox wget (no --spider/--no-verbose), and the server
