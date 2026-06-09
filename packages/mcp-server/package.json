@@ -1,0 +1,31 @@
+{
+  "name": "@verric/mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server exposing Verric runs, reports, evidence, and receipts as MCP tools/resources for coding agents.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "verric-mcp": "./dist/server.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@verric/core": "workspace:*",
+    "@verric/storage": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "esbuild": "^0.24.0",
+    "typescript": "5.7.2"
+  }
+}

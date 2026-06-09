@@ -1,0 +1,108 @@
+name: "Verric — Evidence-Grounded Report"
+description: "Generate a grounded pentest/postmortem/audit report from CI evidence. Real provider or honest failure."
+author: "Verric"
+branding:
+  icon: "shield"
+  color: "red"
+
+inputs:
+  evidence-dir:
+    description: "Directory containing evidence files (scans, logs, screenshots, etc.)."
+    required: true
+  project-file:
+    description: "Path to a ProjectDetails JSON file. Optional; the built-in sample is used if omitted."
+    required: false
+  notes-file:
+    description: "Optional Markdown file appended as manual tester notes."
+    required: false
+  out-dir:
+    description: "Directory where the action writes report.json, receipt.json, etc."
+    required: false
+    default: "./verric-out"
+  provider:
+    description: "openai | anthropic | ollama. Auto-detects from env when omitted."
+    required: false
+  model:
+    description: "Override model id for the chosen provider."
+    required: false
+  signing-key:
+    description: "HMAC key for the cryptographic receipt. Defaults to GITHUB_SHA so receipts are reproducible per commit."
+    required: false
+  template:
+    description: "Report template id (e.g. pentest@0.1.0)."
+    required: false
+    default: "pentest@0.1.0"
+
+outputs:
+  report-path:
+    description: "Path to the generated report.json"
+    value: ${{ steps.run.outputs.report-path }}
+  receipt-path:
+    description: "Path to the signed receipt.json"
+    value: ${{ steps.run.outputs.receipt-path }}
+  receipt-signature:
+    description: "First 16 hex chars of the HMAC signature (for at-a-glance log inspection)"
+    value: ${{ steps.run.outputs.receipt-signature }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: "11.5.2"
+
+    - name: Install + build CLI
+      shell: bash
+      working-directory: ${{ github.action_path }}/../../..
+      run: |
+        pnpm install --frozen-lockfile
+        pnpm --filter @verric/cli build
+
+    - name: Run Verric
+      id: run
+      shell: bash
+      env:
+        # Provide whichever provider creds are present; the CLI picks one.
+        OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ env.ANTHROPIC_API_KEY }}
+        OLLAMA_BASE_URL: ${{ env.OLLAMA_BASE_URL }}
+        VERRIC_PROVIDER: ${{ inputs.provider }}
+        VERRIC_SIGNING_KEY: ${{ inputs.signing-key || github.sha }}
+      run: |
+        set -euo pipefail
+        CLI="${{ github.action_path }}/../../../packages/cli/dist/cli.mjs"
+        PROJECT_ARG=""
+        if [ -n "${{ inputs.project-file }}" ]; then
+          PROJECT_ARG="--project ${{ inputs.project-file }}"
+        fi
+        NOTES_ARG=""
+        if [ -n "${{ inputs.notes-file }}" ]; then
+          NOTES_ARG="--notes ${{ inputs.notes-file }}"
+        fi
+        MODEL_ARG=""
+        if [ -n "${{ inputs.model }}" ]; then
+          MODEL_ARG="--model ${{ inputs.model }}"
+        fi
+        node "$CLI" report \
+          --evidence "${{ inputs.evidence-dir }}" \
+          --out "${{ inputs.out-dir }}" \
+          $PROJECT_ARG \
+          $NOTES_ARG \
+          $MODEL_ARG
+        echo "report-path=${{ inputs.out-dir }}/report.json" >> "$GITHUB_OUTPUT"
+        echo "receipt-path=${{ inputs.out-dir }}/receipt.json" >> "$GITHUB_OUTPUT"
+        SIG=$(node -e "const r=require('${{ inputs.out-dir }}/receipt.json'); process.stdout.write(r.signature.slice(0,16));")
+        echo "receipt-signature=$SIG" >> "$GITHUB_OUTPUT"
+
+    - name: Upload report artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: verric-report
+        path: ${{ inputs.out-dir }}
+        retention-days: 30

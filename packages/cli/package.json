@@ -1,0 +1,29 @@
+{
+  "name": "@verric/cli",
+  "version": "0.1.0",
+  "description": "Verric command-line interface — scriptable evidence-grounded report generation.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "verric": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@verric/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "esbuild": "^0.24.0",
+    "typescript": "5.7.2"
+  }
+}

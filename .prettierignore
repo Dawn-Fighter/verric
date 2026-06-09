@@ -1,0 +1,18 @@
+node_modules
+.next
+.turbo
+dist
+build
+out
+coverage
+pnpm-lock.yaml
+package-lock.json
+*.min.js
+*.min.css
+.codegraph
+
+# Hand-styled markdown — leave the author's voice alone
+README.md
+demo-evidence-pack
+demo-complete-evidence-pack
+demo-complete-evidence-pack-README.md

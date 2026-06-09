@@ -1,0 +1,25 @@
+{
+  "name": "@verric/storage",
+  "version": "0.1.0",
+  "description": "Verric persistence layer — Node's built-in SQLite (node:sqlite). Zero native deps, runs on any Node 22+.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts",
+    "./repository": "./src/repository.ts",
+    "./sqlite": "./src/sqlite.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@verric/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.20",
+    "typescript": "5.7.2"
+  }
+}
